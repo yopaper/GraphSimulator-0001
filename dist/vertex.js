@@ -17,6 +17,9 @@ export class Vertex {
         return new basic.Position(center_pos.x + this._pos.x, center_pos.y + this._pos.y);
     } //-----------------------------------------------------
     //------------------------------------------------------
+    static getUpdateNumberMax() {
+        return Math.ceil(this.vertex_list.length / this.updateCountMax) + 1;
+    } //-----------------------------------------------------
     static addVertex(vertex) {
         if (!this.vertex_list.includes(vertex)) {
             this.vertex_list.push(vertex);
@@ -39,10 +42,28 @@ export class Vertex {
     static vertexCount() {
         return this.vertex_list.length;
     } //-----------------------------------------------------
+    static updateEnable() {
+        return this.updateMode;
+    } //---------------------------------------------------
+    static startUpdate() {
+        this.updateCount = 0;
+        this.updateMode = true;
+    } //----------------------------------------------------
     static updateVertexs() {
-        for (var i = 0; i < this.vertex_list.length; i++) {
+        if (!this.updateMode)
+            return;
+        var updateNumber = this.getUpdateNumberMax();
+        var updateRange = { min: this.updateCount * updateNumber,
+            max: (this.updateCount + 1) * updateNumber };
+        console.log("更新:" + updateRange.min + "~" + updateRange.max);
+        for (var i = updateRange.min; i < updateRange.max; i++) {
+            if (i >= this.vertex_list.length)
+                break;
             this.vertex_list[i].update();
         }
+        this.updateCount += 1;
+        if (this.updateCount >= this.updateCountMax)
+            this.updateMode = false;
     } //----------------------------------------------------
     static showVertexs() {
         for (var i = 0; i < this.vertex_list.length; i++) {
@@ -56,7 +77,10 @@ export class Vertex {
     } //------------------------------------------------------
 } //============================================================
 // STATIC ----------------------------------------------
+Vertex.updateMode = true;
 Vertex.vertex_list = [];
+Vertex.updateCount = 0;
+Vertex.updateCountMax = 5;
 export class GraphVertex extends Vertex {
     //-----------------------------------------------------
     constructor(x, y, set_color) {
@@ -260,7 +284,7 @@ export class CurrentVertex extends GraphVertex {
             }
             else {
                 this._cool_down_counter.reset(10);
-                this._next_color = color.NULL_COLOR;
+                this._next_color = color.BLUE;
             }
         }
         else {

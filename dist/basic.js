@@ -53,6 +53,5 @@ export class RandomCounter extends Counter {
     reset(max_rate = 1) {
         this._count = Math.floor((this._count_range.min +
             Math.random() * (this._count_range.max - this._count_range.min + 1)) * max_rate);
-        console.log(this._count);
     } //----------------------------------------------------------------------
 } //=============================================================
